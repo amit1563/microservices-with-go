@@ -23,7 +23,7 @@ type loggingMiddleware struct {
 
 func (mw loggingMiddleware) Add(x int, y int) (result int, err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log("Method", "Add", "TimeTook", "Result", result, time.Since(begin), "error", err)
+		mw.logger.Log("Method", "Add", "Result", result, "Took", time.Since(begin), "error", err)
 	}(time.Now())
 	return mw.next.Add(x, y)
 }
