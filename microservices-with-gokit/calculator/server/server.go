@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/amit1563/microservices-with-go/microservices-with-gokit/calculator"
 	"github.com/go-kit/kit/log"
@@ -11,6 +12,10 @@ import (
 )
 
 func main() {
+	var (
+		httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
+	)
+	flag.Parse()
 
 	var logger log.Logger
 	{
@@ -28,14 +33,18 @@ func main() {
 	{
 		httpHandler = calculatorservice.MakeHTTPHandler(s, log.With(logger, "component", "http"))
 	}
+	// Interrupt handler.
 	err := make(chan error)
 	go func() {
 		osSigChannel := make(chan os.Signal)
 		signal.Notify(osSigChannel, syscall.SIGINT, syscall.SIGTERM)
 		err <- fmt.Errorf("%s", <-osSigChannel)
 	}()
+	// HTTP transport.
 	go func() {
-		err <- http.ListenAndServe(":8080", httpHandler)
+		err <- http.ListenAndServe(*httpAddr, httpHandler)
 	}()
+	// Run!
 	logger.Log("lastcall", <-err)
+
 }

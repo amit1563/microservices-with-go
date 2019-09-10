@@ -1,6 +1,7 @@
 package calculatorservice
 
 import (
+	"context"
 	"github.com/go-kit/kit/log"
 	"time"
 )
@@ -21,9 +22,9 @@ type loggingMiddleware struct {
 	logger log.Logger
 }
 
-func (mw loggingMiddleware) Add(x int, y int) (result int, err error) {
+func (mw loggingMiddleware) Add(ctx context.Context, x int, y int) (result int, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log("Method", "Add", "Result", result, "Took", time.Since(begin), "error", err)
 	}(time.Now())
-	return mw.next.Add(x, y)
+	return mw.next.Add(ctx, x, y)
 }
