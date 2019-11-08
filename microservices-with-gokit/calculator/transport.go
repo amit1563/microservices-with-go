@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -22,7 +23,7 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
-	r.Methods("GET").Path("/add/").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/add/").Handler(httptransport.NewServer(
 		e.AddEndpoint,
 		decodeAddRequest,
 		encodeResponse,
@@ -41,6 +42,7 @@ func decodeAddResponse(ctx context.Context, res *http.Response) (interface{}, er
 	return response, err
 }
 func decodeAddRequest(ctx context.Context, req *http.Request) (interface{}, error) {
+	fmt.Println("req obj", req)
 	var r addRequest
 	err := json.NewDecoder(req.Body).Decode(&r)
 
